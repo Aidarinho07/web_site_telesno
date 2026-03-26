@@ -51,7 +51,31 @@
       white-space:nowrap;
       background: rgba(255,255,255,.02);
     }
-    .hero{padding:18px 0 10px}
+    .hero{
+      padding:22px;
+      margin:18px 0 10px;
+      border-radius:24px;
+      position:relative;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.12);
+      background-image:
+        linear-gradient(120deg, rgba(11,15,25,.82), rgba(11,15,25,.58)),
+        url("./vector-ecommerce-online-shopping-seamless-background-pattern.jpg");
+      background-size:cover;
+      background-position:center;
+      box-shadow: var(--shadow);
+    }
+    .hero::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background: radial-gradient(900px 300px at 20% 0%, rgba(124,92,255,.30), transparent 65%);
+      pointer-events:none;
+    }
+    .hero > *{
+      position:relative;
+      z-index:1;
+    }
     .grid{
       display:grid; grid-template-columns: 1.25fr .75fr; gap:18px;
       align-items:start;
@@ -79,7 +103,7 @@
       color:#c9ffef;
     }
     .card{
-      background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.02));
+      background: linear-gradient(180deg, rgba(7,10,18,.72), rgba(7,10,18,.64));
       border:1px solid var(--line);
       border-radius:18px;
       padding:18px;
@@ -281,7 +305,7 @@
             <div id="notice" class="notice">Спасибо! Заявка отправлена. Мы свяжемся с вами и пришлём детали оплаты.</div>
 
             <div class="small" style="margin-top:10px">
-              Форма отправляет письмо на email через внешний endpoint. Замените email в настройках скрипта ниже.
+              Форма отправляет заявку в защищенный API и дублирует уведомления по нескольким каналам.
             </div>
           </form>
         </div>
@@ -388,74 +412,6 @@
     </footer>
   </div>
 
-  <script>
-    // =========================
-    // НАСТРОЙКИ ФОРМЫ (поменяйте)
-    // =========================
-    const RECIPIENT_EMAIL = "rakhimov.aydar@yandex.ru"; // замените на вашу реальную почту
-    const FORM_ENDPOINT = `https://formsubmit.co/ajax/${encodeURIComponent(RECIPIENT_EMAIL)}`; // отправка писем без своего бэкенда
-    const FALLBACK_EMAIL = RECIPIENT_EMAIL; // фолбэк через mailto, если endpoint недоступен
-
-    function buildMailto(payload){
-      const subject = `Заявка на фестиваль «Точка контакта» — ${payload.date || ""}`.trim();
-      const lines = [
-        `Имя: ${payload.name}`,
-        `Контакт: ${payload.contact}`,
-        `Telegram: ${payload.tg || "-"}`,
-        `Дата: ${payload.date}`,
-        `Сообщение: ${payload.note || "-"}`,
-        `Источник: landing`
-      ];
-      const body = lines.join("\\n");
-      return `mailto:${encodeURIComponent(FALLBACK_EMAIL)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    }
-
-    const form = document.getElementById("leadForm");
-    const notice = document.getElementById("notice");
-
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      notice.style.display = "none";
-
-      const data = new FormData(form);
-      const payload = {
-        name: data.get("name"),
-        contact: data.get("contact"),
-        tg: data.get("tg"),
-        date: data.get("date"),
-        note: data.get("note"),
-        consent: data.get("consent")
-      };
-
-      // 1) Пытаемся отправить через endpoint
-      let ok = false;
-      try{
-        const res = await fetch(FORM_ENDPOINT, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-          },
-          body: JSON.stringify({
-            ...payload,
-            _subject: `Заявка на фестиваль «Точка контакта» — ${payload.date || ""}`.trim(),
-            _captcha: "false"
-          })
-        });
-        ok = res && res.ok;
-      }catch(err){
-        ok = false;
-      }
-
-      // 2) Фолбэк: отправка через email
-      if(!ok){
-        window.location.href = buildMailto(payload);
-      }
-
-      // 3) UX: показываем сообщение (даже если ушло в mailto)
-      notice.style.display = "block";
-      form.reset();
-    });
-  </script>
+  <script src="./form-handler.js"></script>
 </body>
 </html>

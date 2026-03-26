@@ -271,7 +271,7 @@
             <textarea id="note" name="note" placeholder="Темп, комфорт, вопросы безопасности, что лучше учитывать."></textarea>
 
             <div class="check">
-              <input type="checkbox" id="consent" required />
+              <input type="checkbox" id="consent" name="consent" required />
               <label for="consent" style="margin:0">
                 Я согласен(а) на обработку данных для связи по фестивалю.
               </label>
@@ -281,7 +281,7 @@
             <div id="notice" class="notice">Спасибо! Заявка отправлена. Мы свяжемся с вами и пришлём детали оплаты.</div>
 
             <div class="small" style="margin-top:10px">
-              Если у вас нет подключенного бэкенда на сайте, форма отправит письмо на email (заглушка). Замените email/эндпоинт в коде.
+              Форма отправляет письмо на email через внешний endpoint. Замените email в настройках скрипта ниже.
             </div>
           </form>
         </div>
@@ -392,13 +392,9 @@
     // =========================
     // НАСТРОЙКИ ФОРМЫ (поменяйте)
     // =========================
-    const FORM_ENDPOINT = "/api/lead"; // если у вас есть бэкенд/проксирование — замените на ваш URL
-    const FALLBACK_EMAIL = "organizer@example.com"; // куда отправлять через mailto, если endpoint недоступен
-
-    // Поля для письма
-    function escapeForEmail(s){
-      return String(s ?? "").replace(/%/g, "%25").replace(/\+/g, "%2B").replace(/&/g, "%26");
-    }
+    const RECIPIENT_EMAIL = "rakhimov.aydar@yandex.ru"; // замените на вашу реальную почту
+    const FORM_ENDPOINT = `https://formsubmit.co/ajax/${encodeURIComponent(RECIPIENT_EMAIL)}`; // отправка писем без своего бэкенда
+    const FALLBACK_EMAIL = RECIPIENT_EMAIL; // фолбэк через mailto, если endpoint недоступен
 
     function buildMailto(payload){
       const subject = `Заявка на фестиваль «Точка контакта» — ${payload.date || ""}`.trim();
@@ -431,13 +427,20 @@
         consent: data.get("consent")
       };
 
-      // 1) Пытаемся отправить через endpoint (если он есть)
+      // 1) Пытаемся отправить через endpoint
       let ok = false;
       try{
         const res = await fetch(FORM_ENDPOINT, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          body: JSON.stringify({
+            ...payload,
+            _subject: `Заявка на фестиваль «Точка контакта» — ${payload.date || ""}`.trim(),
+            _captcha: "false"
+          })
         });
         ok = res && res.ok;
       }catch(err){

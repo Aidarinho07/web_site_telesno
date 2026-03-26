@@ -1,0 +1,458 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Фестиваль «Точка контакта» — платный онлайн</title>
+  <meta name="description" content="Фестиваль танцевально-двигательных и телесных практик онлайн «Точка контакта». 3 дня живого опыта в Talk + бережная сборка." />
+  <style>
+    :root{
+      --bg:#0b0f19;
+      --card:#121a2b;
+      --text:#eaf0ff;
+      --muted:#a9b4d6;
+      --accent:#7c5cff;
+      --accent2:#2de2a6;
+      --line:rgba(255,255,255,.10);
+      --btn:#7c5cff;
+      --btnText:#0b0f19;
+      --danger:#ff5c7a;
+      --shadow:0 22px 70px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+      color:var(--text);
+      line-height:1.45;
+      background:
+        radial-gradient(1100px 650px at 10% 0%, rgba(124,92,255,.30), transparent 55%),
+        radial-gradient(900px 540px at 90% 12%, rgba(45,226,166,.18), transparent 55%),
+        var(--bg);
+    }
+    a{color:inherit}
+    .wrap{max-width:1120px; margin:0 auto; padding:0 18px}
+    .nav{
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      padding:18px 0;
+    }
+    .brand{display:flex; align-items:center; gap:12px; font-weight:900; letter-spacing:.2px}
+    .logo{
+      width:42px; height:42px; border-radius:14px;
+      background: linear-gradient(135deg, rgba(124,92,255,.95), rgba(45,226,166,.65));
+      box-shadow:0 10px 30px rgba(124,92,255,.25);
+    }
+    .pill{
+      border:1px solid var(--line);
+      padding:8px 12px;
+      border-radius:999px;
+      color:var(--muted);
+      font-size:13px;
+      white-space:nowrap;
+      background: rgba(255,255,255,.02);
+    }
+    .hero{padding:18px 0 10px}
+    .grid{
+      display:grid; grid-template-columns: 1.25fr .75fr; gap:18px;
+      align-items:start;
+    }
+    @media (max-width: 900px){ .grid{grid-template-columns:1fr} }
+    h1{
+      margin:0 0 10px;
+      font-size:44px; line-height:1.04;
+      letter-spacing:-.7px;
+    }
+    @media (max-width: 600px){ h1{font-size:32px} }
+    .sub{color:var(--muted); font-size:16px; margin:0 0 16px}
+    .tagrow{display:flex; gap:10px; flex-wrap:wrap; margin:12px 0 18px}
+    .tag{
+      padding:8px 12px; border-radius:999px;
+      border:1px solid rgba(124,92,255,.30);
+      background: rgba(124,92,255,.10);
+      color:#d9d0ff;
+      font-size:13px;
+      white-space:nowrap;
+    }
+    .tag.alt{
+      border-color: rgba(45,226,166,.22);
+      background: rgba(45,226,166,.10);
+      color:#c9ffef;
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.02));
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:18px;
+      box-shadow: var(--shadow);
+    }
+    .section{padding:18px 0}
+    .section h2{margin:0 0 12px; font-size:22px}
+    .btns{display:flex; gap:12px; flex-wrap:wrap; align-items:center}
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:12px 16px; border-radius:14px;
+      text-decoration:none;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      font-weight:800;
+    }
+    .btn.primary{
+      background: var(--btn);
+      border-color: rgba(124,92,255,.55);
+      color:var(--btnText);
+      box-shadow:0 16px 40px rgba(124,92,255,.25);
+    }
+    .muted{color:var(--muted)}
+    .cols3{display:grid; grid-template-columns: repeat(3, 1fr); gap:12px}
+    @media (max-width: 900px){ .cols3{grid-template-columns:1fr} }
+    .feature{
+      padding:14px; border-radius:16px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+    }
+    .feature b{display:block; margin-bottom:6px}
+    .divider{height:1px; background:var(--line); margin:14px 0}
+    .list{margin:0; padding-left:18px; color:var(--muted)}
+    .list li{margin:8px 0}
+    .grid2{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+    @media (max-width: 900px){ .grid2{grid-template-columns:1fr} }
+    .form label{display:block; font-size:13px; color:var(--muted); margin:10px 0 6px}
+    .form input, .form select, .form textarea{
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      background: rgba(0,0,0,.20);
+      border:1px solid rgba(255,255,255,.12);
+      color:var(--text);
+      outline:none;
+    }
+    .form textarea{min-height:96px; resize:vertical}
+    .row2{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+    @media (max-width: 600px){ .row2{grid-template-columns:1fr} }
+    .check{
+      display:flex; align-items:flex-start; gap:10px; margin-top:10px;
+      color:var(--muted); font-size:13px;
+    }
+    .check input{margin-top:3px}
+    .submit{
+      width:100%;
+      margin-top:14px;
+      padding:14px 16px;
+      border-radius:16px;
+      background: var(--btn);
+      border:1px solid rgba(124,92,255,.55);
+      color:var(--btnText);
+      font-weight:900;
+      cursor:pointer;
+    }
+    .notice{
+      display:none;
+      margin-top:12px;
+      padding:12px;
+      border-radius:14px;
+      border:1px solid rgba(45,226,166,.35);
+      background: rgba(45,226,166,.10);
+      color:#d8fff3;
+      font-weight:800;
+    }
+    .small{color:var(--muted); font-size:12.5px}
+    footer{padding:22px 0 40px; color:rgba(255,255,255,.55); font-size:12px}
+    .link{
+      color:#c9c0ff; text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+    .price{
+      display:flex; gap:12px; align-items:baseline; flex-wrap:wrap;
+      margin:6px 0 2px;
+    }
+    .price strong{
+      font-size:34px; letter-spacing:-.6px;
+    }
+    .kbd{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size:12px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      padding:4px 8px; border-radius:10px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="nav">
+      <div class="brand">
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          Точка контакта
+          <div class="small">Фестиваль телесных и танцевально-двигательных практик</div>
+        </div>
+      </div>
+      <div class="pill">Платный онлайн • эфиры в Talk</div>
+    </div>
+
+    <section class="hero">
+      <div class="grid">
+        <div class="card">
+          <h1>Фестиваль «Точка контакта»</h1>
+          <p class="sub">
+            3 дня живого опыта: <b>плавный вход</b> → <b>погружение</b> → <b>бережная сборка</b>.
+            Одна тема, один сюжет, один путь.
+          </p>
+
+          <div class="tagrow">
+            <div class="tag">Тема 2026: <span>[вставьте формулировку темы]</span></div>
+            <div class="tag alt">3 дня: пятница–воскресенье</div>
+            <div class="tag">Talk • участие онлайн</div>
+          </div>
+
+          <div class="grid2">
+            <div class="feature">
+              <b>Куда ваша “точка контакта”</b>
+              <div class="small">В себе, в движении, и в границах — чтобы возвращаться в опору.</div>
+            </div>
+            <div class="feature">
+              <b>Что получите</b>
+              <ul class="list">
+                <li>практики с ясными рамками и бережностью</li>
+                <li>обратную связь после каждого дня</li>
+                <li>электронный сертификат участника</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="btns">
+            <a class="btn primary" href="#lead">Хочу попасть</a>
+            <a class="btn" href="#program">Смотреть структуру</a>
+          </div>
+
+          <p class="small" style="margin-top:10px">
+            Это онлайн-формат: фокус на живом участии. Записи — <span>[укажите политику: будут/не будут/как именно]</span>.
+          </p>
+        </div>
+
+        <div class="card" id="lead">
+          <h2 style="margin:0 0 10px">Заявка на участие</h2>
+          <div class="small">Выберите дату, оставьте контакты — мы пришлём детали по оплате и ссылку на Talk.</div>
+
+          <div class="divider"></div>
+
+          <div class="price">
+            <strong>[вставьте цену]</strong>
+            <div class="small">за участие (платный фестиваль)</div>
+          </div>
+
+          <form id="leadForm" class="form" autocomplete="on">
+            <label for="name">Имя</label>
+            <input id="name" name="name" placeholder="Например, Анна" required />
+
+            <div class="row2">
+              <div>
+                <label for="contact">Телефон или email</label>
+                <input id="contact" name="contact" placeholder="+7... или name@mail.com" required />
+              </div>
+              <div>
+                <label for="tg">Telegram (необязательно)</label>
+                <input id="tg" name="tg" placeholder="@username" />
+              </div>
+            </div>
+
+            <label for="date">Выберите дату</label>
+            <select id="date" name="date" required>
+              <option value="" selected>—</option>
+              <option>22–24 мая (Казань)</option>
+              <option>5–7 июня (онлайн)</option>
+              <option>12–14 июня (онлайн)</option>
+            </select>
+
+            <label for="note">Что важно для вашей бережности? (опционально)</label>
+            <textarea id="note" name="note" placeholder="Темп, комфорт, вопросы безопасности, что лучше учитывать."></textarea>
+
+            <div class="check">
+              <input type="checkbox" id="consent" required />
+              <label for="consent" style="margin:0">
+                Я согласен(а) на обработку данных для связи по фестивалю.
+              </label>
+            </div>
+
+            <button class="submit" type="submit">Отправить заявку</button>
+            <div id="notice" class="notice">Спасибо! Заявка отправлена. Мы свяжемся с вами и пришлём детали оплаты.</div>
+
+            <div class="small" style="margin-top:10px">
+              Если у вас нет подключенного бэкенда на сайте, форма отправит письмо на email (заглушка). Замените email/эндпоинт в коде.
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="program">
+      <h2>Структура 3 дней</h2>
+      <div class="cols3">
+        <div class="feature">
+          <b>День 1 — открытие + 2 линейки</b>
+          <div class="small">Контакт с собой: сенсорика, внимание, мягкий вход.</div>
+        </div>
+        <div class="feature">
+          <b>День 2 — 3 линейки</b>
+          <div class="small">Контакт в движении: проживание темы и настройка качества движения.</div>
+        </div>
+        <div class="feature">
+          <b>День 3 — 3 линейки + закрытие</b>
+          <div class="small">Границы и интеграция: выбор, “стоп/пауза” и сборка опыта.</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="grid2">
+        <div class="feature">
+          <b>До фестиваля</b>
+          <ul class="list">
+            <li>представление ведущих и анонсы классов</li>
+            <li>контент от каждого: мини-статья + мини-практика + микро-взаимодействия</li>
+            <li>легкие активности: вопросы, фокус внимания дня</li>
+          </ul>
+        </div>
+        <div class="feature">
+          <b>После фестиваля</b>
+          <ul class="list">
+            <li>1 раз в неделю общий контент канала</li>
+            <li>каждый участник публикуется примерно 1 раз в квартал</li>
+            <li>общий сбор обратной связи в конце</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Бережное участие (нет-манифест)</h2>
+      <div class="card" style="padding:16px; box-shadow:none;">
+        <ul class="list">
+          <li>Контакт по согласию: можно стоп/пауза, можно “мимо”.</li>
+          <li>Уважение границ и уязвимостей без давления.</li>
+          <li>Телесная этика: приватность, безопасность процесса, достоинство.</li>
+          <li>Профессиональный контекст: ясные инструкции и бережная подача.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>FAQ</h2>
+      <div class="grid2">
+        <div class="feature">
+          <b>Можно участвовать, если я не “телесный специалист”?</b>
+          <div class="small">Да. Фестиваль для тех, кто хочет возвращаться в контакт с собой через движение и внимание.</div>
+        </div>
+        <div class="feature">
+          <b>Нужно ли включать камеру?</b>
+          <div class="small">Не обязательно. В приоритете ваш комфорт и чувство безопасности.</div>
+        </div>
+        <div class="feature">
+          <b>Записи будут?</b>
+          <div class="small">[вставьте вашу формулировку]</div>
+        </div>
+        <div class="feature">
+          <b>Что вы присылаете после заявки?</b>
+          <div class="small">Ссылку на Talk, расписание, и короткую памятку “как подготовиться к практикам”.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Как подключиться</h2>
+      <div class="grid2">
+        <div class="feature">
+          <b>Эфиры</b>
+          <div class="small">Подключение через Talk. Ссылка придёт вам после регистрации.</div>
+        </div>
+        <div class="feature">
+          <b>Подготовка</b>
+          <div class="small">
+            Подготовьте место, воду и наушники (по желанию). В любой момент можно сделать паузу.
+            <div style="margin-top:8px" class="kbd">Стоп-право всегда с вами</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div>
+        © 2026 «Точка контакта». [Добавьте контакты/юридическую информацию при необходимости]
+      </div>
+      <div style="margin-top:8px">
+        Вопросы: <span class="muted">[вставьте email/телеграм организатора]</span>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // =========================
+    // НАСТРОЙКИ ФОРМЫ (поменяйте)
+    // =========================
+    const FORM_ENDPOINT = "/api/lead"; // если у вас есть бэкенд/проксирование — замените на ваш URL
+    const FALLBACK_EMAIL = "organizer@example.com"; // куда отправлять через mailto, если endpoint недоступен
+
+    // Поля для письма
+    function escapeForEmail(s){
+      return String(s ?? "").replace(/%/g, "%25").replace(/\+/g, "%2B").replace(/&/g, "%26");
+    }
+
+    function buildMailto(payload){
+      const subject = `Заявка на фестиваль «Точка контакта» — ${payload.date || ""}`.trim();
+      const lines = [
+        `Имя: ${payload.name}`,
+        `Контакт: ${payload.contact}`,
+        `Telegram: ${payload.tg || "-"}`,
+        `Дата: ${payload.date}`,
+        `Сообщение: ${payload.note || "-"}`,
+        `Источник: landing`
+      ];
+      const body = lines.join("\\n");
+      return `mailto:${encodeURIComponent(FALLBACK_EMAIL)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    }
+
+    const form = document.getElementById("leadForm");
+    const notice = document.getElementById("notice");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      notice.style.display = "none";
+
+      const data = new FormData(form);
+      const payload = {
+        name: data.get("name"),
+        contact: data.get("contact"),
+        tg: data.get("tg"),
+        date: data.get("date"),
+        note: data.get("note"),
+        consent: data.get("consent")
+      };
+
+      // 1) Пытаемся отправить через endpoint (если он есть)
+      let ok = false;
+      try{
+        const res = await fetch(FORM_ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        ok = res && res.ok;
+      }catch(err){
+        ok = false;
+      }
+
+      // 2) Фолбэк: отправка через email
+      if(!ok){
+        window.location.href = buildMailto(payload);
+      }
+
+      // 3) UX: показываем сообщение (даже если ушло в mailto)
+      notice.style.display = "block";
+      form.reset();
+    });
+  </script>
+</body>
+</html>

@@ -1731,7 +1731,7 @@ button {
 }
 /* Финальная цитата перед футером */
 .final-quote {
-  padding: clamp(56px, 9vw, 110px) 0;
+  padding: clamp(39px, 6.3vw, 77px) 0;
   text-align: center;
 }
 

@@ -454,6 +454,10 @@ button {
   white-space: nowrap;
 }
 
+.about__signals-cta {
+  margin-bottom: 24px;
+}
+
 .section__text {
   font-size: 17px;
   color: var(--color-text-muted);

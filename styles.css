@@ -1729,3 +1729,22 @@ button {
     transition: none;
   }
 }
+/* Финальная цитата перед футером */
+.final-quote {
+  padding: clamp(56px, 9vw, 110px) 0;
+  text-align: center;
+}
+
+.final-quote__text {
+  margin: 0 auto;
+  max-width: 760px;
+  font-family: var(--font-heading, inherit);
+  font-size: clamp(1.35rem, 2.6vw, 2.1rem);
+  line-height: 1.45;
+  font-style: italic;
+  color: var(--color-primary);
+}
+
+.final-quote__cta {
+  margin-top: 32px;
+}

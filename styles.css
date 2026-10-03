@@ -618,7 +618,7 @@ button {
   margin-left: clamp(36px, 7vw, 72px);
   margin-right: -20px;
   /* приподнимаем блок над центром колонки */
-  transform: translateY(-18%);
+  transform: translateY(-36%);
 }
 
 #for-whom .for-whom__lead {

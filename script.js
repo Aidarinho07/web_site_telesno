@@ -170,26 +170,47 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function sendBookingEmail() {
-    const endpoint = window.FORM_CONFIG?.email?.endpoint;
+    const cfg = window.FORM_CONFIG?.email;
     const values = getFormValues();
-    if (!endpoint || !values) return;
+    if (!cfg?.endpoint || !values) return;
 
-    try {
-      await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({
-          _subject: 'Заявка на тренинг «Отношения: тяни, толкай»',
-          _template: 'table',
-          Имя: values.name,
-          Телефон: values.phone,
-          Почта: values.email,
-          Событие: 'Тренинг «Отношения: тяни, толкай», 20–21 октября 2026, Тюмень',
-        }),
-      });
-    } catch {
-      // Заявка могла уйти (сервер получил запрос) — не показываем ошибку пользователю
+    // FormSubmit принимает только обычную POST-форму (fetch/AJAX блокируется
+    // защитой Cloudflare) — поэтому отправляем скрытый iframe + form.submit().
+    let frame = document.getElementById('booking-mail-frame');
+    if (!frame) {
+      frame = document.createElement('iframe');
+      frame.name = 'booking-mail-frame';
+      frame.id = 'booking-mail-frame';
+      frame.hidden = true;
+      document.body.appendChild(frame);
     }
+
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = cfg.endpoint;
+    form.target = 'booking-mail-frame';
+
+    const fields = {
+      _subject: 'Заявка на тренинг «Отношения: тяни, толкай»',
+      _template: 'table',
+      _captcha: 'false',
+      Имя: values.name,
+      Телефон: values.phone,
+      Почта: values.email,
+      Событие: 'Тренинг «Отношения: тяни, толкай», 20–21 октября 2026, Тюмень',
+    };
+
+    for (const [key, value] of Object.entries(fields)) {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = key;
+      input.value = value;
+      form.appendChild(input);
+    }
+
+    document.body.appendChild(form);
+    form.submit();
+    form.remove();
   }
 
   if (bookingForm) {

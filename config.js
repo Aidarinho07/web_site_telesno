@@ -1,7 +1,9 @@
 window.FORM_CONFIG = {
   // Отправка заявок с формы на почту (FormSubmit.co)
+  // _next — страница подтверждения после успешной отправки
   email: {
-    endpoint: 'https://formsubmit.co/ajax/rakhimov.aydar@yandex.ru,aida.baymukhametova@gmail.com',
+    endpoint: 'https://formsubmit.co/rakhimov.aydar@yandex.ru',
+    next: 'https://aidarinho07.github.io/web_site_telesno/?sent=1',
   },
 
   booking: {

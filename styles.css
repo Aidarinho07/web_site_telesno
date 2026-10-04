@@ -477,13 +477,18 @@ p.hero__eyebrow {
 }
 
 .section__text.about__signals-text {
-  /* шрифт как у .hero__benefits li + выравнивание по ширине */
+  /* шрифт как у .hero__benefits li + выравнивание по центру */
   font-family: var(--font-body);
   font-size: 16px;
   font-weight: 400;
   line-height: 1.55;
-  color: var(--color-text);
-  text-align: justify;
+  color: #b86b4a;
+  text-align: center;
+}
+
+/* заголовок "И ЭТО МОЖНО ИЗМЕНИТЬ" — по центру */
+#about .section__title {
+  text-align: center;
 }
 
 .section__text em {

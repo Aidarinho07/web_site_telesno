@@ -20,6 +20,7 @@ window.FORM_CONFIG = {
     message: 'Здравствуйте, хочу записаться на тренинг к Аглае Датешидзе',
     vk: '412170144',
     max: 'https://max.ru/u/f9LHodD0cOL-YbWj7SKU2B9SWe9PIhrNJ-Nbiwx6v4zHyWGRqbcceXVWKBo',
+    tg: '@Aida_Baimukhametova',
   },
 
   contact: {

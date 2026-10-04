@@ -1244,6 +1244,15 @@ button {
   background: rgba(0, 119, 255, 0.06);
 }
 
+.messenger-btn--tg {
+  border-color: rgba(0, 136, 204, 0.35);
+}
+
+.messenger-btn--tg:hover {
+  border-color: #0088cc;
+  background: rgba(0, 136, 204, 0.06);
+}
+
 .booking-toast {
   position: fixed;
   left: 50%;

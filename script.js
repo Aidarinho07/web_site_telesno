@@ -31,6 +31,24 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
+    if (cfg.tg) {
+      const tgRaw = String(cfg.tg).trim();
+      let tgUrl;
+
+      if (/^https?:\/\//i.test(tgRaw)) {
+        tgUrl = tgRaw.replace(/\/$/, '');
+      } else {
+        const tgUsername = tgRaw.replace(/^@/, '');
+        if (tgUsername) {
+          tgUrl = `https://t.me/${tgUsername}`;
+        }
+      }
+
+      if (tgUrl) {
+        links.tg = `${tgUrl}/${encodeURIComponent(getBookingMessage())}`;
+      }
+    }
+
     if (cfg.max) {
       const maxRaw = String(cfg.max).trim();
       let maxUrl;

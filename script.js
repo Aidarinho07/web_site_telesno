@@ -151,8 +151,25 @@ document.addEventListener('DOMContentLoaded', () => {
     // Сначала проверяем форму: без заполненных полей кнопка не работает
     if (!validateBookingForm()) return;
 
-    // Параллельно (не блокируя переход) отправляем заявку на почту
-    sendBookingEmail();
+    const values = getFormValues();
+
+    // Отправляем заявку в Getform (основной канал — заявки сохраняются
+    // даже если почта FormSubmit не активирована) и параллельно дублируем
+    // письмом через FormSubmit. Ожидание сетевой отправки ограничено 1,5 с,
+    // чтобы переход в чат не зависел от скорости интернета на телефоне.
+    if (values) {
+      try {
+        await Promise.race([
+          Promise.allSettled([
+            sendLeadToGetform(values),
+            Promise.resolve(sendBookingEmailFallback(values)),
+          ]),
+          new Promise((resolve) => setTimeout(resolve, 1500)),
+        ]);
+      } catch {
+        // заявка всё равно уходит, переход не блокируем
+      }
+    }
 
     const copied = await copyBookingMessage();
     closeModal();
@@ -187,20 +204,41 @@ document.addEventListener('DOMContentLoaded', () => {
     return valid;
   }
 
-  async function sendBookingEmail() {
-    const cfg = window.FORM_CONFIG?.email;
-    const values = getFormValues();
-    if (!cfg || !values) return;
+  // Заявки в один клик без почты и бэкенда: сервис Getform.
+  // Форма регистрируется на getform.io, адрес берётся из config.js
+  // (window.FORM_CONFIG.getform.endpoint). Отправка — fetch с JSON,
+  // работает и на десктопе, и на мобильных браузерах.
+  function sendLeadToGetform(values) {
+    const endpoint = window.FORM_CONFIG?.getform?.endpoint;
+    if (!endpoint) return Promise.resolve(false);
 
-    // Список получателей: каждый адрес = отдельное письмо через свой эндпоинт
-    // FormSubmit (поле _forward-to у сервиса не работает, поэтому шлём
-    // независимые письма каждому получателю).
+    return fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        subject: 'Заявка на тренинг «Отношения: тяни, толкай»',
+        name: values.name,
+        phone: values.phone,
+        email: values.email,
+        event: 'Тренинг «Отношения: тяни, толкай», 20–21 октября 2026, Тюмень',
+        source: navigator.userAgent,
+      }),
+    })
+      .then((res) => res.ok)
+      .catch(() => false);
+  }
+
+  // Резервный канал: FormSubmit (скрытый iframe + form.submit()).
+  // Работает только если почта активирована ссылкой из первого письма
+  // FormSubmit; иначе заявка всё равно сохранится в Getform.
+  function sendBookingEmailFallback(values) {
+    const cfg = window.FORM_CONFIG?.email;
+    if (!cfg) return;
+
     const recipients = Array.isArray(cfg.recipients) && cfg.recipients.length
       ? cfg.recipients
-      : ['rakhimov.aydar@yandex.ru'];
+      : [];
 
-    // FormSubmit принимает только обычную POST-форму (fetch/AJAX блокируется
-    // защитой Cloudflare) — поэтому отправляем скрытые iframe + form.submit().
     const fields = {
       _subject: 'Заявка на тренинг «Отношения: тяни, толкай»',
       _template: 'table',
@@ -213,11 +251,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     recipients.forEach((addr, i) => {
       const frameId = `booking-mail-frame-${i}`;
-      if (!document.getElementById(frameId)) {
-        const frame = document.createElement('iframe');
+      let frame = document.getElementById(frameId);
+      if (!frame) {
+        frame = document.createElement('iframe');
         frame.name = frameId;
         frame.id = frameId;
-        frame.hidden = true;
+        frame.style.position = 'absolute';
+        frame.style.width = '1px';
+        frame.style.height = '1px';
+        frame.style.border = '0';
+        frame.style.opacity = '0';
+        frame.setAttribute('aria-hidden', 'true');
         document.body.appendChild(frame);
       }
 

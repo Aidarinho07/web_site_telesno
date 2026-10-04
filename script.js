@@ -172,47 +172,54 @@ document.addEventListener('DOMContentLoaded', () => {
   async function sendBookingEmail() {
     const cfg = window.FORM_CONFIG?.email;
     const values = getFormValues();
-    if (!cfg?.endpoint || !values) return;
+    if (!cfg || !values) return;
+
+    // Список получателей: каждый адрес = отдельное письмо через свой эндпоинт
+    // FormSubmit (поле _forward-to у сервиса не работает, поэтому шлём
+    // независимые письма каждому получателю).
+    const recipients = Array.isArray(cfg.recipients) && cfg.recipients.length
+      ? cfg.recipients
+      : ['rakhimov.aydar@yandex.ru'];
 
     // FormSubmit принимает только обычную POST-форму (fetch/AJAX блокируется
-    // защитой Cloudflare) — поэтому отправляем скрытый iframe + form.submit().
-    let frame = document.getElementById('booking-mail-frame');
-    if (!frame) {
-      frame = document.createElement('iframe');
-      frame.name = 'booking-mail-frame';
-      frame.id = 'booking-mail-frame';
-      frame.hidden = true;
-      document.body.appendChild(frame);
-    }
-
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = cfg.endpoint;
-    form.target = 'booking-mail-frame';
-
+    // защитой Cloudflare) — поэтому отправляем скрытые iframe + form.submit().
     const fields = {
       _subject: 'Заявка на тренинг «Отношения: тяни, толкай»',
       _template: 'table',
       _captcha: 'false',
-      // Копия письма на второй адрес через пересылку FormSubmit
-      ...(cfg.forward ? { '_forward-to': cfg.forward } : {}),
       Имя: values.name,
       Телефон: values.phone,
       Почта: values.email,
       Событие: 'Тренинг «Отношения: тяни, толкай», 20–21 октября 2026, Тюмень',
     };
 
-    for (const [key, value] of Object.entries(fields)) {
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = key;
-      input.value = value;
-      form.appendChild(input);
-    }
+    recipients.forEach((addr, i) => {
+      const frameId = `booking-mail-frame-${i}`;
+      if (!document.getElementById(frameId)) {
+        const frame = document.createElement('iframe');
+        frame.name = frameId;
+        frame.id = frameId;
+        frame.hidden = true;
+        document.body.appendChild(frame);
+      }
 
-    document.body.appendChild(form);
-    form.submit();
-    form.remove();
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = `https://formsubmit.co/${addr}`;
+      form.target = frameId;
+
+      for (const [key, value] of Object.entries(fields)) {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = value;
+        form.appendChild(input);
+      }
+
+      document.body.appendChild(form);
+      form.submit();
+      form.remove();
+    });
   }
 
   if (bookingForm) {

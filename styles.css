@@ -477,8 +477,13 @@ p.hero__eyebrow {
 }
 
 .section__text.about__signals-text {
-  font-size: 20px;
+  /* шрифт как у .hero__benefits li + выравнивание по ширине */
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.55;
   color: var(--color-text);
+  text-align: justify;
 }
 
 .section__text em {
@@ -1602,7 +1607,7 @@ p.hero__eyebrow {
   }
 
   .section__text.about__signals-text {
-    font-size: 17px;
+    font-size: 16px;
   }
 
   .section__text {

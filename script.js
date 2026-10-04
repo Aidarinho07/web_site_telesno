@@ -141,7 +141,19 @@ document.addEventListener('DOMContentLoaded', () => {
     window.open(url, '_blank', 'noopener,noreferrer');
   }
 
-  async function handleMessengerClick(event) {
+  let pendingMessengerUrl = null;
+
+  async function finalizeMessengerRedirect() {
+    if (!pendingMessengerUrl) return;
+    const url = pendingMessengerUrl;
+    pendingMessengerUrl = null;
+    const copied = await copyBookingMessage();
+    closeModal();
+    showBookingToast(copied);
+    openMessengerLink(url);
+  }
+
+  function handleMessengerClick(event) {
     const btn = event.currentTarget;
     const url = btn.dataset.webHref || btn.getAttribute('href');
     if (!url) return;
@@ -153,9 +165,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const values = getFormValues();
 
-    // Заявка уходит синхронным submit() скрытой формы (см. выше) — запрос
-    // стартует немедленно, поэтому переход в чат не зависит от скорости
-    // интернета на телефоне и фоновых fetch-запросов.
+    // Мобильные браузеры уничтожают незавершённые сетевые запросы и
+    // скрипты страницы, как только переход уводит во внешний протокол
+    // (t.me / vk / max → мессенджер или App Store). Поэтому на мобильной
+    // версии сначала отправляем заявку через FormSubmit и ЖДЁМ ответа
+    // (FormSubmit отвечает редиректом — событие load означает, что
+    // запрос обработан сервером), и только потом уходим в чат.
+    // На ПК этот же код отрабатывает мгновенно: новая вкладка не
+    // выгружает страницу, письмо уходит в фоне.
+    if (values && MOBILE_RE.test(navigator.userAgent)) {
+      pendingMessengerUrl = url;
+      const guard = setTimeout(finalizeMessengerRedirect, 2500);
+      sendBookingEmailOnce(values, () => {
+        clearTimeout(guard);
+        finalizeMessengerRedirect();
+      });
+      return;
+    }
+
     if (values) {
       try {
         sendBookingEmailMain(values);
@@ -164,10 +191,13 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
 
-    const copied = await copyBookingMessage();
-    closeModal();
-    showBookingToast(copied);
-    openMessengerLink(url);
+    // обычный путь (ПК): отправка в фоне + немедленный переход
+    (async () => {
+      const copied = await copyBookingMessage();
+      closeModal();
+      showBookingToast(copied);
+      openMessengerLink(url);
+    })();
   }
 
   // ===== Booking form =====
@@ -205,15 +235,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Отправка выполняется синхронным submit() скрытой формы в iframe —
   // запрос гарантированно стартует до перехода в мессенджер даже на
   // мобильных браузерах (в отличие от фонового fetch).
-  function sendBookingEmailMain(values) {
-    const cfg = window.FORM_CONFIG?.email;
-    if (!cfg) return;
-
-    const recipients = Array.isArray(cfg.recipients) && cfg.recipients.length
-      ? cfg.recipients
-      : [];
-
-    const fields = {
+  function buildEmailFields(values) {
+    return {
       _subject: 'Заявка на тренинг «Отношения: тяни, толкай»',
       _template: 'table',
       _captcha: 'false',
@@ -222,39 +245,87 @@ document.addEventListener('DOMContentLoaded', () => {
       Почта: values.email,
       Событие: 'Тренинг «Отношения: тяни, толкай», 20–21 октября 2026, Тюмень',
     };
+  }
+
+  function postToFormSubmit(addr, fields, frameId, onDone) {
+    let frame = document.getElementById(frameId);
+    if (!frame) {
+      frame = document.createElement('iframe');
+      frame.name = frameId;
+      frame.id = frameId;
+      frame.style.position = 'absolute';
+      frame.style.width = '1px';
+      frame.style.height = '1px';
+      frame.style.border = '0';
+      frame.style.opacity = '0';
+      frame.setAttribute('aria-hidden', 'true');
+      document.body.appendChild(frame);
+    }
+
+    if (typeof onDone === 'function') {
+      // FormSubmit после приёма заявки отвечает редиректом на страницу
+      // «Thank you» — событие load в iframe означает, что сервер принял
+      // заявку и письмо поставлено в очередь.
+      frame.addEventListener('load', () => onDone(), { once: true });
+    }
+
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = `https://formsubmit.co/${addr}`;
+    form.target = frameId;
+
+    for (const [key, value] of Object.entries(fields)) {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = key;
+      input.value = value;
+      form.appendChild(input);
+    }
+
+    document.body.appendChild(form);
+    form.submit();
+    form.remove();
+  }
+
+  // Ожидание подтверждения от FormSubmit перед уходом в мессенджер
+  // используется только на мобильных (см. handleMessengerClick).
+  function sendBookingEmailOnce(values, onDone) {
+    const cfg = window.FORM_CONFIG?.email;
+    if (!cfg) {
+      onDone && onDone();
+      return;
+    }
+
+    const recipients = Array.isArray(cfg.recipients) ? cfg.recipients : [];
+    if (!recipients.length) {
+      onDone && onDone();
+      return;
+    }
+
+    const fields = buildEmailFields(values);
+    let pending = recipients.length;
+    const doneOne = () => {
+      pending -= 1;
+      if (pending <= 0 && onDone) onDone();
+    };
 
     recipients.forEach((addr, i) => {
-      const frameId = `booking-mail-frame-${i}`;
-      let frame = document.getElementById(frameId);
-      if (!frame) {
-        frame = document.createElement('iframe');
-        frame.name = frameId;
-        frame.id = frameId;
-        frame.style.position = 'absolute';
-        frame.style.width = '1px';
-        frame.style.height = '1px';
-        frame.style.border = '0';
-        frame.style.opacity = '0';
-        frame.setAttribute('aria-hidden', 'true');
-        document.body.appendChild(frame);
-      }
+      postToFormSubmit(addr, fields, `booking-mail-frame-${i}`, doneOne);
+    });
+  }
 
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = `https://formsubmit.co/${addr}`;
-      form.target = frameId;
+  function sendBookingEmailMain(values) {
+    const cfg = window.FORM_CONFIG?.email;
+    if (!cfg) return;
 
-      for (const [key, value] of Object.entries(fields)) {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = key;
-        input.value = value;
-        form.appendChild(input);
-      }
+    const recipients = Array.isArray(cfg.recipients) && cfg.recipients.length
+      ? cfg.recipients
+      : [];
 
-      document.body.appendChild(form);
-      form.submit();
-      form.remove();
+    const fields = buildEmailFields(values);
+
+    recipients.forEach((addr, i) => {
+      postToFormSubmit(addr, fields, `booking-mail-frame-${i}`);
     });
   }
 

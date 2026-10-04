@@ -1,4 +1,9 @@
 window.FORM_CONFIG = {
+  // Отправка заявок с формы на почту (FormSubmit.co)
+  email: {
+    endpoint: 'https://formsubmit.co/ajax/rakhimov.aydar@yandex.ru,aida.baymukhametova@gmail.com',
+  },
+
   booking: {
     message: 'Здравствуйте, хочу записаться на тренинг к Аглае Датешидзе',
     vk: '412170144',

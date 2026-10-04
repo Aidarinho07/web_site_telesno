@@ -1113,6 +1113,68 @@ button {
   gap: 12px;
 }
 
+/* ===== Booking form (modal) ===== */
+.booking-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 18px;
+  text-align: left;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.field__required {
+  color: var(--color-primary);
+  margin-left: 2px;
+}
+
+.field__input {
+  width: 100%;
+  padding: 12px 14px;
+  font-family: inherit;
+  font-size: 15px;
+  color: var(--color-text);
+  background: var(--color-bg);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+.field__input::placeholder {
+  color: rgba(107, 93, 82, 0.55);
+}
+
+.field__input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(184, 107, 74, 0.12);
+}
+
+.booking-form.has-error .field__input {
+  border-color: #c0563e;
+}
+
+.field__error {
+  font-size: 13px;
+  line-height: 1.4;
+  color: #c0563e;
+}
+
+.modal__hint--after-form {
+  margin-bottom: 14px;
+}
+
 .messenger-btn {
   display: flex;
   align-items: center;

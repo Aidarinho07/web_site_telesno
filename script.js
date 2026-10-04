@@ -130,10 +130,72 @@ document.addEventListener('DOMContentLoaded', () => {
 
     event.preventDefault();
 
+    // Сначала проверяем форму: без заполненных полей кнопка не работает
+    if (!validateBookingForm()) return;
+
+    // Параллельно (не блокируя переход) отправляем заявку на почту
+    sendBookingEmail();
+
     const copied = await copyBookingMessage();
     closeModal();
     showBookingToast(copied);
     openMessengerLink(url);
+  }
+
+  // ===== Booking form =====
+  const bookingForm = document.getElementById('booking-form');
+  const formError = document.getElementById('form-error');
+
+  function getFormValues() {
+    if (!bookingForm) return null;
+    const data = new FormData(bookingForm);
+    return {
+      name: String(data.get('name') || '').trim(),
+      phone: String(data.get('phone') || '').trim(),
+      email: String(data.get('email') || '').trim(),
+    };
+  }
+
+  function validateBookingForm() {
+    const values = getFormValues();
+    if (!values) return true;
+
+    const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(values.email);
+    const phoneDigits = values.phone.replace(/\D/g, '');
+    const valid = values.name.length >= 2 && phoneDigits.length >= 10 && emailOk;
+
+    if (formError) formError.hidden = valid;
+    bookingForm.classList.toggle('has-error', !valid);
+    return valid;
+  }
+
+  async function sendBookingEmail() {
+    const endpoint = window.FORM_CONFIG?.email?.endpoint;
+    const values = getFormValues();
+    if (!endpoint || !values) return;
+
+    try {
+      await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          _subject: 'Заявка на тренинг «Отношения: тяни, толкай»',
+          _template: 'table',
+          Имя: values.name,
+          Телефон: values.phone,
+          Почта: values.email,
+          Событие: 'Тренинг «Отношения: тяни, толкай», 20–21 октября 2026, Тюмень',
+        }),
+      });
+    } catch {
+      // Заявка могла уйти (сервер получил запрос) — не показываем ошибку пользователю
+    }
+  }
+
+  if (bookingForm) {
+    bookingForm.addEventListener('input', () => {
+      if (bookingForm.classList.contains('has-error')) validateBookingForm();
+    });
   }
 
   function openModal() {

@@ -314,7 +314,24 @@
       <button class="modal__close" data-close-modal aria-label="Закрыть">&times;</button>
       <h2 id="modal-title" class="modal__title">Записаться на тренинг</h2>
       <p class="modal__subtitle">«Отношения: тяни, толкай» — 20–21 октября, Тюмень</p>
-      <p class="modal__hint">Выберите удобный мессенджер для связи</p>
+
+      <form class="booking-form" id="booking-form" novalidate>
+        <label class="field">
+          <span class="field__label">Ваше имя<span class="field__required">*</span></span>
+          <input class="field__input" type="text" name="name" autocomplete="name" required placeholder="Как к вам обращаться">
+        </label>
+        <label class="field">
+          <span class="field__label">Телефон<span class="field__required">*</span></span>
+          <input class="field__input" type="tel" name="phone" autocomplete="tel" inputmode="tel" required placeholder="+7 (___) ___-__-__">
+        </label>
+        <label class="field">
+          <span class="field__label">Почта<span class="field__required">*</span></span>
+          <input class="field__input" type="email" name="email" autocomplete="email" inputmode="email" required placeholder="you@example.com">
+        </label>
+        <p class="field__error" id="form-error" hidden>Пожалуйста, заполните все поля корректно</p>
+      </form>
+
+      <p class="modal__hint modal__hint--after-form">Заполните форму и выберите удобный мессенджер для связи</p>
       <div class="messenger-picker">
         <a class="messenger-btn messenger-btn--max" data-messenger="max" target="_blank" rel="noopener noreferrer" hidden>
           <span class="messenger-btn__icon messenger-btn__icon--brand" aria-hidden="true">

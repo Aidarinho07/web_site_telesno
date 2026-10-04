@@ -153,19 +153,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const values = getFormValues();
 
-    // Отправляем заявку в Getform (основной канал — заявки сохраняются
-    // даже если почта FormSubmit не активирована) и параллельно дублируем
-    // письмом через FormSubmit. Ожидание сетевой отправки ограничено 1,5 с,
-    // чтобы переход в чат не зависел от скорости интернета на телефоне.
+    // Заявка уходит синхронным submit() скрытой формы (см. выше) — запрос
+    // стартует немедленно, поэтому переход в чат не зависит от скорости
+    // интернета на телефоне и фоновых fetch-запросов.
     if (values) {
       try {
-        await Promise.race([
-          Promise.allSettled([
-            sendLeadToGetform(values),
-            Promise.resolve(sendBookingEmailFallback(values)),
-          ]),
-          new Promise((resolve) => setTimeout(resolve, 1500)),
-        ]);
+        sendBookingEmailMain(values);
       } catch {
         // заявка всё равно уходит, переход не блокируем
       }
@@ -204,34 +197,15 @@ document.addEventListener('DOMContentLoaded', () => {
     return valid;
   }
 
-  // Заявки в один клик без почты и бэкенда: сервис Getform.
-  // Форма регистрируется на getform.io, адрес берётся из config.js
-  // (window.FORM_CONFIG.getform.endpoint). Отправка — fetch с JSON,
-  // работает и на десктопе, и на мобильных браузерах.
-  function sendLeadToGetform(values) {
-    const endpoint = window.FORM_CONFIG?.getform?.endpoint;
-    if (!endpoint) return Promise.resolve(false);
-
-    return fetch(endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        subject: 'Заявка на тренинг «Отношения: тяни, толкай»',
-        name: values.name,
-        phone: values.phone,
-        email: values.email,
-        event: 'Тренинг «Отношения: тяни, толкай», 20–21 октября 2026, Тюмень',
-        source: navigator.userAgent,
-      }),
-    })
-      .then((res) => res.ok)
-      .catch(() => false);
-  }
-
-  // Резервный канал: FormSubmit (скрытый iframe + form.submit()).
-  // Работает только если почта активирована ссылкой из первого письма
-  // FormSubmit; иначе заявка всё равно сохранится в Getform.
-  function sendBookingEmailFallback(values) {
+  // Основной канал приёма заявок: письма через FormSubmit.co.
+  // ВАЖНО: FormSubmit не доставляет письма, пока каждый адрес получателя
+  // не активирован переходом по ссылке из первого «письма-активации»
+  // (проверьте входящие и Спам на обеих почтах). После активации письма
+  // приходят на все адреса из config.js.
+  // Отправка выполняется синхронным submit() скрытой формы в iframe —
+  // запрос гарантированно стартует до перехода в мессенджер даже на
+  // мобильных браузерах (в отличие от фонового fetch).
+  function sendBookingEmailMain(values) {
     const cfg = window.FORM_CONFIG?.email;
     if (!cfg) return;
 

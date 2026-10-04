@@ -265,11 +265,16 @@ button {
   margin-bottom: 14px;
 }
 
-.hero__eyebrow {
+p.hero__eyebrow {
+  font-family: var(--font-body);
   font-size: clamp(17px, 2.2vw, 19px);
   line-height: 1.65;
   color: var(--color-text-muted);
   margin-bottom: 14px;
+  font-weight: normal;
+  font-style: normal;
+  text-transform: none;
+  letter-spacing: normal;
 }
 
 .hero__hook strong {

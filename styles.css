@@ -918,6 +918,10 @@ p.hero__eyebrow {
   line-height: 1.7;
 }
 
+.trainer__spacer {
+  height: 24px;
+}
+
 /* ===== Price ===== */
 .price-grid {
   display: grid;

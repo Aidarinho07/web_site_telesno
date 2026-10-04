@@ -1,1 +1,31 @@
-d2luZG93LkZPUk1fQ09ORklHID0gewogIC8vINCe0YLQv9GA0LDQstC60LAg0LfQsNGP0LLQvtC6INGBINGE0L7RgNC80Ysg0L3QsCDQv9C+0YfRgtGDIChGb3JtU3VibWl0LmNvKQogIC8vIF9uZXh0IOKAlCDRgdGC0YDQsNC90LjRhtCwINC/0L7QtNGC0LLQtdGA0LbQtNC10L3QuNGPINC/0L7RgdC70LUg0YPRgdC/0LXRiNC90L7QuSDQvtGC0L/RgNCw0LLQutC4CiAgZW1haWw6IHsKICAgIC8vINCe0YLQv9GA0LDQstC60LAg0YfQtdGA0LXQtyBGb3JtU3VibWl0LmNvLiDQktCQ0JbQndCeOiDQv9C+0LvQtSBfZm9yd2FyZC10byDRgyBGb3JtU3VibWl0INC90LUg0YDQsNCx0L7RgtCw0LXRgiwKICAgIC8vINC/0L7RjdGC0L7QvNGDINC30LDRj9Cy0LrQsCDQvtGC0L/RgNCw0LLQu9GP0LXRgtGB0Y8g0JTQktCj0JzQryDQvdC10LfQsNCy0LjRgdC40LzRi9C80Lgg0L/QuNGB0YzQvNCw0LzQuCDigJQg0L/QviDQvtC00L3QvtC80YMg0Y3QvdC00L/QvtC40L3RgtGDCiAgICAvLyDQvdCwINC60LDQttC00L7Qs9C+INC/0L7Qu9GD0YfQsNGC0LXQu9GPLiDQntCx0LAg0LDQtNGA0LXRgdCwINC00L7Qu9C20L3RiyDQsdGL0YLRjCDQsNC60YLQuNCy0LjRgNC+0LLQsNC90Ysg0LIgRm9ybVN1Ym1pdDoKICAgIC8vINC/0L7RgdC70LUg0L/QtdGA0LLQvtC5INC+0YLQv9GA0LDQstC60Lgg0LrQsNC20LTQvtC80YMg0L/QvtC70YPRh9Cw0YLQtdC70Y4g0L/RgNC40YXQvtC00LjRgiDQv9C40YHRjNC80L4g0YHQviDRgdGB0YvQu9C60L7QuQogICAgLy8g0L/QvtC00YLQstC10YDQttC00LXQvdC40Y8gKNC/0YDQvtCy0LXRgNC40YLRjCDCq9Ch0L/QsNC8wrspLgogICAgcmVjaXBpZW50czogWwogICAgICAncmFraGltb3YuYXlkYXJAeWFuZGV4LnJ1JywKICAgICAgJ2FpZGEuYmF5bXVraGFtZXRvdmFAZ21haWwuY29tJywKICAgIF0sCiAgICAvLyDQodC+0LLQvNC10YHRgtC40LzQvtGB0YLRjCDRgdC+INGB0YLQsNGA0L7QuSDQstC10YDRgdC40LXQuSDRgdC60YDQuNC/0YLQsDoKICAgIGVuZHBvaW50OiAnaHR0cHM6Ly9mb3Jtc3VibWl0LmNvL3Jha2hpbW92LmF5ZGFyQHlhbmRleC5ydScsCiAgICBuZXh0OiAnaHR0cHM6Ly9haWRhcmluaG8wNy5naXRodWIuaW8vd2ViX3NpdGVfdGVsZXNuby8/c2VudD0xJywKICB9LAoKICBib29raW5nOiB7CiAgICBtZXNzYWdlOiAn0JfQtNGA0LDQstGB0YLQstGD0LnRgtC1LCDRhdC+0YfRgyDQt9Cw0L/QuNGB0LDRgtGM0YHRjyDQvdCwINGC0YDQtdC90LjQvdCzINC6INCQ0LPQu9Cw0LUg0JTQsNGC0LXRiNC40LTQt9C1JywKICAgIHZrOiAnNDEyMTcwMTQ0JywKICAgIG1heDogJ2h0dHBzOi8vbWF4LnJ1L3UvZjlMSG9kRDBjT0wtWWJXajdTS1UyQjlTV2U5UElock5KLU5iaXd4NnY0ekh5V0dScWJjY2VYVldLQm8nLAogICAgdGc6ICdAQWlkYV9CYWltdWtoYW1ldG92YScsCiAgfSwKCiAgY29udGFjdDogewogICAgbmFtZTogJ9CQ0LjQtNCwINCR0LDQudC80YPRhdCw0LzQtdGC0L7QstCwJywKICAgIHBob25lOiAnKzcgOTgyIDk4NyA4MDMwJywKICAgIHZrOiAnaHR0cHM6Ly92ay5ydS9pZDQxMjE3MDE0NCcsCiAgfSwKfTsK
+window.FORM_CONFIG = {
+  // Отправка заявок с формы на почту (FormSubmit.co)
+  // _next — страница подтверждения после успешной отправки
+  email: {
+    // Отправка через FormSubmit.co. ВАЖНО: поле _forward-to у FormSubmit не работает,
+    // поэтому заявка отправляется ДВУМЯ независимыми письмами — по одному эндпоинту
+    // на каждого получателя. Оба адреса должны быть активированы в FormSubmit:
+    // после первой отправки каждому получателю приходит письмо со ссылкой
+    // подтверждения (проверить «Спам»).
+    recipients: [
+      'rakhimov.aydar@yandex.ru',
+      'aida.baymukhametova@gmail.com',
+    ],
+    // Совместимость со старой версией скрипта:
+    endpoint: 'https://formsubmit.co/rakhimov.aydar@yandex.ru',
+    next: 'https://aidarinho07.github.io/web_site_telesno/?sent=1',
+  },
+
+  booking: {
+    message: 'Здравствуйте, хочу записаться на тренинг к Аглае Датешидзе',
+    vk: '412170144',
+    max: 'https://max.ru/u/f9LHodD0cOL-YbWj7SKU2B9SWe9PIhrNJ-Nbiwx6v4zHyWGRqbcceXVWKBo',
+    tg: '@Aida_Baimukhametova',
+  },
+
+  contact: {
+    name: 'Аида Баймухаметова',
+    phone: '+7 982 987 8030',
+    vk: 'https://vk.ru/id412170144',
+  },
+};

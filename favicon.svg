@@ -1,1 +1,28 @@
-PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSLQotC10LvQviwg0LrQvtGC0L7RgNC+0LUg0LLRgdGRINCy0YvQstC+0LfQuNGCIj4KICA8cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHJ4PSIxNCIgZmlsbD0iI2YzZWRlNCIvPgogIDxjaXJjbGUgY3g9IjMyIiBjeT0iMzIiIHI9IjI4IiBmaWxsPSIjZmFmN2YyIi8+CiAgPGNpcmNsZSBjeD0iMzIiIGN5PSIzMiIgcj0iMjciIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2I4NmI0YSIgc3Ryb2tlLXdpZHRoPSIxLjEiIG9wYWNpdHk9IjAuMjIiLz4KICA8Y2lyY2xlIGN4PSIzMiIgY3k9IjIwLjUiIHI9IjUuMiIgZmlsbD0iI2I4NmI0YSIvPgogIDxwYXRoCiAgICBmaWxsPSJub25lIgogICAgc3Ryb2tlPSIjYjg2YjRhIgogICAgc3Ryb2tlLXdpZHRoPSIyLjYiCiAgICBzdHJva2UtbGluZWNhcD0icm91bmQiCiAgICBzdHJva2UtbGluZWpvaW49InJvdW5kIgogICAgZD0iTTMyIDI1Ljd2MTMuMk0yNC41IDMzLjVsNy41LTIuMiA3LjUgMi4yIgogIC8+CiAgPHBhdGgKICAgIGZpbGw9Im5vbmUiCiAgICBzdHJva2U9IiNiODZiNGEiCiAgICBzdHJva2Utd2lkdGg9IjIuNiIKICAgIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIKICAgIGQ9Ik0yNC41IDMzLjVjLTcuNS01LjUtNi41LTEzLjUgMS41LTE2LjJNMzkuNSAzMy41YzcuNS01LjUgNi41LTEzLjUtMS41LTE2LjIiCiAgLz4KICA8cGF0aAogICAgZmlsbD0ibm9uZSIKICAgIHN0cm9rZT0iIzZiOGY3MSIKICAgIHN0cm9rZS13aWR0aD0iMi42IgogICAgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIgogICAgZD0iTTI1LjUgNDQuNWw2LjUgNC4yIDYuNS00LjIiCiAgLz4KPC9zdmc+Cg==
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Тело, которое всё вывозит">
+  <rect width="64" height="64" rx="14" fill="#f3ede4"/>
+  <circle cx="32" cy="32" r="28" fill="#faf7f2"/>
+  <circle cx="32" cy="32" r="27" fill="none" stroke="#b86b4a" stroke-width="1.1" opacity="0.22"/>
+  <circle cx="32" cy="20.5" r="5.2" fill="#b86b4a"/>
+  <path
+    fill="none"
+    stroke="#b86b4a"
+    stroke-width="2.6"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    d="M32 25.7v13.2M24.5 33.5l7.5-2.2 7.5 2.2"
+  />
+  <path
+    fill="none"
+    stroke="#b86b4a"
+    stroke-width="2.6"
+    stroke-linecap="round"
+    d="M24.5 33.5c-7.5-5.5-6.5-13.5 1.5-16.2M39.5 33.5c7.5-5.5 6.5-13.5-1.5-16.2"
+  />
+  <path
+    fill="none"
+    stroke="#6b8f71"
+    stroke-width="2.6"
+    stroke-linecap="round"
+    d="M25.5 44.5l6.5 4.2 6.5-4.2"
+  />
+</svg>

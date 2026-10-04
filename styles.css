@@ -265,6 +265,13 @@ button {
   margin-bottom: 14px;
 }
 
+.hero__eyebrow {
+  font-size: clamp(17px, 2.2vw, 19px);
+  line-height: 1.65;
+  color: var(--color-text-muted);
+  margin-bottom: 14px;
+}
+
 .hero__hook strong {
   color: var(--color-text);
   font-weight: 700;

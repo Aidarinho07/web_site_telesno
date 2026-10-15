@@ -164,6 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!validateBookingForm()) return;
 
     const values = getFormValues();
+    trackGoal('lead_submit', { messenger: btn.dataset.messenger });
 
     // Мобильные браузеры уничтожают незавершённые сетевые запросы и
     // скрипты страницы, как только переход уводит во внешний протокол
@@ -211,6 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
       name: String(data.get('name') || '').trim(),
       phone: String(data.get('phone') || '').trim(),
       email: String(data.get('email') || '').trim(),
+      consent: data.get('consent') === 'on',
     };
   }
 
@@ -220,7 +222,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(values.email);
     const phoneDigits = values.phone.replace(/\D/g, '');
-    const valid = values.name.length >= 2 && phoneDigits.length >= 10 && emailOk;
+    const valid =
+      values.name.length >= 2 && phoneDigits.length >= 10 && emailOk && values.consent;
 
     if (formError) formError.hidden = valid;
     bookingForm.classList.toggle('has-error', !valid);
@@ -243,6 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
       Имя: values.name,
       Телефон: values.phone,
       Почта: values.email,
+      'Согласие на обработку ПДн': values.consent ? 'да' : 'нет',
       Событие: 'Тренинг «Отношения: тяни, толкай», 20–21 октября 2026, Тюмень',
     };
   }
@@ -335,17 +339,26 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function openModal() {
+  let lastFocused = null;
+
+  function openModal(event) {
     updateMessengerLinks();
+    lastFocused = document.activeElement;
     modal.classList.add('is-open');
     modal.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
+    const source = event?.currentTarget?.dataset?.goalSource;
+    trackGoal('form_open', source ? { source } : undefined);
+    if (!MOBILE_RE.test(navigator.userAgent)) {
+      setTimeout(() => modal.querySelector('.field__input')?.focus(), 80);
+    }
   }
 
   function closeModal() {
     modal.classList.remove('is-open');
     modal.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
+    if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
   }
 
   document.querySelectorAll('[data-open-modal]').forEach((btn) => {
@@ -366,13 +379,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  burger.addEventListener('click', () => {
+  if (burger && nav) burger.addEventListener('click', () => {
     const isOpen = nav.classList.toggle('is-open');
     burger.classList.toggle('is-active', isOpen);
     burger.setAttribute('aria-expanded', isOpen);
   });
 
-  nav.querySelectorAll('a').forEach((link) => {
+  nav?.querySelectorAll('a, button').forEach((link) => {
     link.addEventListener('click', () => {
       nav.classList.remove('is-open');
       burger.classList.remove('is-active');
@@ -381,13 +394,15 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   const header = document.querySelector('.header');
-  window.addEventListener('scroll', () => {
-    header.style.boxShadow =
-      window.scrollY > 20 ? '0 4px 20px rgba(61, 43, 31, 0.08)' : 'none';
-  });
+  const onScroll = () => header.classList.toggle('is-scrolled', window.scrollY > 20);
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
 
-  initLeadReveal();
   initPrepAccordion();
+  initReveal();
+  initPricing();
+  initCountdown();
+  initStickyCta();
 });
 
 function initPrepAccordion() {
@@ -404,31 +419,157 @@ function initPrepAccordion() {
   });
 }
 
-function initLeadReveal() {
-  const elements = document.querySelectorAll('.for-whom__lead, .reveal-accent');
-  if (!elements.length) return;
+// ===== Analytics hook =====
+// Цели для Яндекс Метрики: form_open (открыта форма), lead_submit
+// (заявка отправлена, выбран мессенджер). Срабатывают, если счётчик
+// подключён и его номер указан в config.js → metrika.id.
+function trackGoal(name, params) {
+  const id = window.FORM_CONFIG?.metrika?.id;
+  try {
+    if (id && typeof window.ym === 'function') window.ym(id, 'reachGoal', name, params);
+  } catch {
+    // аналитика не должна ломать запись
+  }
+  document.dispatchEvent(new CustomEvent('booking:goal', { detail: { name, params } }));
+}
 
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+// ===== Event timing (время Тюмени, UTC+5) =====
+const EVENT_START = new Date('2026-10-20T18:30:00+05:00');
+const EVENT_END = new Date('2026-10-21T22:30:00+05:00');
 
-  elements.forEach((element) => {
-    if (reducedMotion) {
-      element.classList.add('is-visible');
-      return;
+function formatRub(amount) {
+  return `${amount.toLocaleString('ru-RU').replace(/ /g, ' ')} ₽`;
+}
+
+function pluralRu(n, one, few, many) {
+  const mod10 = n % 10;
+  const mod100 = n % 100;
+  if (mod10 === 1 && mod100 !== 11) return one;
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return few;
+  return many;
+}
+
+function initPricing() {
+  const cards = [...document.querySelectorAll('[data-tier-until]')];
+  if (!cards.length) return;
+
+  const now = new Date();
+  let current = null;
+
+  cards.forEach((card) => {
+    const until = new Date(`${card.dataset.tierUntil}T23:59:59+05:00`);
+    card.classList.remove('is-past', 'is-current');
+    if (now > until) {
+      card.classList.add('is-past');
+    } else if (!current) {
+      current = card;
+      card.classList.add('is-current');
     }
-
-    const section = element.closest('section');
-    if (!section) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          element.classList.add('is-visible');
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.35 }
-    );
-
-    observer.observe(section);
   });
+
+  if (!current || now > EVENT_END) return;
+
+  const amount = Number(current.querySelector('.price-card__amount')?.textContent.replace(/\D/g, ''));
+  if (!amount) return;
+  const price = formatRub(amount);
+  const isLast = current === cards[cards.length - 1];
+  const untilDate = new Date(`${current.dataset.tierUntil}T12:00:00+05:00`);
+  const untilText = untilDate.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', timeZone: 'Asia/Yekaterinburg' });
+  const next = cards[cards.indexOf(current) + 1];
+  const nextAmount = next ? Number(next.querySelector('.price-card__amount')?.textContent.replace(/\D/g, '')) : 0;
+
+  const set = (selector, html) => {
+    document.querySelectorAll(selector).forEach((el) => {
+      el.innerHTML = html;
+      el.hidden = false;
+    });
+  };
+
+  set('[data-price-now]', `Участие: <strong>${price}</strong>`);
+  set('[data-price-sticky]', price);
+  set('[data-price-modal]', `Стоимость участия: ${price}`);
+  set(
+    '[data-price-inline]',
+    isLast
+      ? `<strong>${price}</strong><br>последние места`
+      : `<strong>${price}</strong> до ${untilText}<br>затем ${formatRub(nextAmount)}`
+  );
+  if (!isLast && nextAmount) {
+    set(
+      '[data-price-deadline]',
+      `Сейчас <strong>${price}</strong>. С ${new Date(untilDate.getTime() + 864e5).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', timeZone: 'Asia/Yekaterinburg' })} цена вырастет до ${formatRub(nextAmount)}. Оплата и детали после записи в мессенджере.`
+    );
+  }
+}
+
+function initCountdown() {
+  const el = document.querySelector('[data-countdown]');
+  if (!el) return;
+
+  const now = new Date();
+  const dayKey = (d) => d.toLocaleDateString('en-CA', { timeZone: 'Asia/Yekaterinburg' });
+  let text = '';
+
+  if (now < EVENT_START) {
+    const days = Math.round((Date.parse(dayKey(EVENT_START)) - Date.parse(dayKey(now))) / 864e5);
+    if (days <= 0) text = 'Старт сегодня в 18:30';
+    else if (days === 1) text = 'Старт уже завтра';
+    else text = `До старта ${days} ${pluralRu(days, 'день', 'дня', 'дней')}`;
+  } else if (now <= EVENT_END) {
+    text = 'Тренинг идёт прямо сейчас';
+  }
+
+  if (text) {
+    el.textContent = text;
+    el.hidden = false;
+  }
+}
+
+function initStickyCta() {
+  const bar = document.querySelector('.sticky-cta');
+  const hero = document.querySelector('.hero');
+  if (!bar || !hero || !('IntersectionObserver' in window)) return;
+
+  const hideZones = [hero, document.querySelector('.final'), document.querySelector('.footer')].filter(Boolean);
+  const visible = new Set();
+
+  const update = () => {
+    const show = visible.size === 0 && !document.querySelector('.modal.is-open');
+    bar.classList.toggle('is-visible', show);
+    bar.setAttribute('aria-hidden', String(!show));
+    bar.querySelector('button')?.setAttribute('tabindex', show ? '0' : '-1');
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) visible.add(entry.target);
+      else visible.delete(entry.target);
+    });
+    update();
+  }, { threshold: 0.05 });
+
+  hideZones.forEach((zone) => observer.observe(zone));
+}
+
+function initReveal() {
+  const items = document.querySelectorAll('.reveal');
+  if (!items.length) return;
+
+  if (!('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    items.forEach((el) => el.classList.add('is-visible'));
+    return;
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      const el = entry.target;
+      const siblings = [...el.parentElement.children].filter((c) => c.classList.contains('reveal'));
+      el.style.transitionDelay = `${Math.min(siblings.indexOf(el), 4) * 80}ms`;
+      el.classList.add('is-visible');
+      observer.unobserve(el);
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+  items.forEach((el) => observer.observe(el));
 }

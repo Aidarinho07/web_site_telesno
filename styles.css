@@ -1191,6 +1191,35 @@ p.hero__eyebrow {
   border-color: #c0563e;
 }
 
+.consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.consent__input {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin: 1px 0 0;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+.consent__text a {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+.booking-form.has-consent-error .consent__input {
+  outline: 2px solid #c0563e;
+  outline-offset: 2px;
+}
+
 .field__error {
   font-size: 13px;
   line-height: 1.4;

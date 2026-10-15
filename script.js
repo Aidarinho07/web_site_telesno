@@ -211,6 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
       name: String(data.get('name') || '').trim(),
       phone: String(data.get('phone') || '').trim(),
       email: String(data.get('email') || '').trim(),
+      consent: data.get('consent') === 'on',
     };
   }
 
@@ -220,10 +221,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(values.email);
     const phoneDigits = values.phone.replace(/\D/g, '');
-    const valid = values.name.length >= 2 && phoneDigits.length >= 10 && emailOk;
+    const fieldsOk = values.name.length >= 2 && phoneDigits.length >= 10 && emailOk;
+    const valid = fieldsOk && values.consent;
 
-    if (formError) formError.hidden = valid;
-    bookingForm.classList.toggle('has-error', !valid);
+    if (formError) {
+      formError.hidden = valid;
+      formError.textContent = fieldsOk
+        ? 'Пожалуйста, подтвердите согласие на обработку персональных данных'
+        : 'Пожалуйста, заполните все поля корректно';
+    }
+    bookingForm.classList.toggle('has-error', !fieldsOk);
+    bookingForm.classList.toggle('has-consent-error', !values.consent);
     return valid;
   }
 
@@ -243,6 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
       Имя: values.name,
       Телефон: values.phone,
       Почта: values.email,
+      'Согласие на обработку ПД': values.consent ? 'Да' : 'Нет',
       Событие: 'Тренинг «Отношения: тяни, толкай», 20–21 октября 2026, Тюмень',
     };
   }
@@ -331,7 +340,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (bookingForm) {
     bookingForm.addEventListener('input', () => {
-      if (bookingForm.classList.contains('has-error')) validateBookingForm();
+      if (bookingForm.classList.contains('has-error') || bookingForm.classList.contains('has-consent-error')) {
+        validateBookingForm();
+      }
     });
   }
 
